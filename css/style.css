@@ -1,49 +1,39 @@
 body {
-  margin: 0;
-}
-
-body::after {
-  content: '';
-  position: absolute;
-  width: 100vw;
-  height: 100vh;
-  top: 0;
-  left: 0;
-  background: url(/img/noise-light.png);
-  background-repeat: repeat;
+    margin: 0;
+    background: #111118;
 }
 
 canvas {
-  position: relative;
-  width: 100vh;
-  height: 100vw;
-  z-index: 0;
+    position: relative;
+    width: 100vh;
+    height: 100vw;
+    z-index: 0;
 }
 
- .trigger {
-  display: block;
-  height: 50px;
-  width: 200px;
-  position: absolute;
-  bottom: 70px;
-  left: calc(50vw - 100px);
-  z-index: 100;
-  background: none;
-  border: 2px solid rgba(255,255,255,0.9);
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.9);
-  font-family: Helvetica, sans-serif;
-  font-size: 1.3em;
-  font-weight: 100;
-  outline: none;
-  transition: 0.2s;
- }
+.trigger {
+    display: block;
+    height: 44px;
+    width: 120px;
+    position: absolute;
+    bottom: 60px;
+    left: calc(50vw - 60px);
+    z-index: 100;
+    background: black;
+    border: none;
+    color: white;
+    font-family: Helvetica, sans-serif;
+    text-transform: uppercase;
+    font-size: 1rem;
+    outline: none;
+    opacity: 1;
+    transition: 100ms;
+    cursor: pointer;
+}
 
 .trigger:hover {
-  background: rgba(255,255,255,0.9);
-  color: rgba(40,40,40,0.9);
+    opacity: 0.9;
 }
 
 .trigger:active {
-  bottom: 67px;
+    bottom: 67px;
 }
