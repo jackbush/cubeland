@@ -33,39 +33,40 @@ scene.add(dirLight)
 
 const cubeColors = [0xf8909c, 0xfba4b0, 0xfebdc8, 0xf8988b, 0xffaa86, 0xfeec85, 0xff9e70, 0x6fcfbf, 0xff967c, 0xfc8faa, 0xe685a4, 0xad8ed6, 0xb1bed6, 0x9ec3d4, 0x7091ca, 0x7699db, 0x9adcf0, 0x84e4d8, 0xa1e9d7, 0xa3e28c, 0xe9eb7f]
 
-function bricks() {
-  const shapes = []
+const allShapes = []
 
+function bricks() {
   for (let n = 0; n < config.numberOfShapes; n++) {
     const s = config.maxSize
     const geometry = new THREE.BoxGeometry(s * Math.random(), s * Math.random(), s * Math.random())
     const material = new THREE.MeshLambertMaterial({ color: cubeColors[Math.floor(Math.random() * cubeColors.length)] })
-    shapes[n] = new THREE.Mesh(geometry, material)
+    const shape = new THREE.Mesh(geometry, material)
 
-    shapes[n].castShadow = true
+    shape.castShadow = true
+    shape.translateX(config.spawnSpread * (Math.random() - 0.5))
+    shape.translateZ(config.spawnSpread * (Math.random() - 0.5))
+    shape.translateY(config.spawnHeight + config.spawnSpread * (Math.random() - 0.5))
+    shape.drift = config.driftMax * (Math.random() - 0.5)
+    shape.index = n
 
-    shapes[n].translateX(config.spawnSpread * (Math.random() - 0.5))
-    shapes[n].translateZ(config.spawnSpread * (Math.random() - 0.5))
-    shapes[n].translateY(config.spawnHeight + config.spawnSpread * (Math.random() - 0.5))
-    shapes[n].drift = config.driftMax * (Math.random() - 0.5)
-
-    scene.add(shapes[n])
+    scene.add(shape)
+    allShapes.push(shape)
   }
-
-  const render = () => {
-    requestAnimationFrame(render)
-    renderer.render(scene, camera)
-    for (let n = 0; n < config.numberOfShapes; n++) {
-      shapes[n].rotation.x += config.rotBaseX * Math.random() + config.rotScale * n
-      shapes[n].rotation.y += config.rotBaseY * Math.random() + config.rotScale * n
-      shapes[n].rotation.z += config.rotBaseZ * Math.random() + config.rotScale * n
-      shapes[n].position.y -= config.fallBase * Math.random() + config.fallScale * n
-      shapes[n].position.x += shapes[n].drift
-    }
-  }
-
-  render()
 }
 
-bricks()
+const render = () => {
+  requestAnimationFrame(render)
+  renderer.render(scene, camera)
+  for (const shape of allShapes) {
+    const n = shape.index
+    shape.rotation.x += config.rotBaseX * Math.random() + config.rotScale * n
+    shape.rotation.y += config.rotBaseY * Math.random() + config.rotScale * n
+    shape.rotation.z += config.rotBaseZ * Math.random() + config.rotScale * n
+    shape.position.y -= config.fallBase * Math.random() + config.fallScale * n
+    shape.position.x += shape.drift
+  }
+}
+
+render()
+
 document.querySelector('.trigger').addEventListener('click', bricks)
