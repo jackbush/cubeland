@@ -16,6 +16,7 @@ const config = {
 
 const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
+renderer.setPixelRatio(window.devicePixelRatio)
 document.body.appendChild(renderer.domElement)
 
 const scene = new THREE.Scene()
@@ -33,7 +34,7 @@ scene.add(dirLight)
 
 const cubeColors = [0xf8909c, 0xfba4b0, 0xfebdc8, 0xf8988b, 0xffaa86, 0xfeec85, 0xff9e70, 0x6fcfbf, 0xff967c, 0xfc8faa, 0xe685a4, 0xad8ed6, 0xb1bed6, 0x9ec3d4, 0x7091ca, 0x7699db, 0x9adcf0, 0x84e4d8, 0xa1e9d7, 0xa3e28c, 0xe9eb7f]
 
-const allShapes = []
+let allShapes = []
 
 function bricks() {
   for (let n = 0; n < config.numberOfShapes; n++) {
@@ -42,12 +43,15 @@ function bricks() {
     const material = new THREE.MeshLambertMaterial({ color: cubeColors[Math.floor(Math.random() * cubeColors.length)] })
     const shape = new THREE.Mesh(geometry, material)
 
-    shape.castShadow = true
     shape.translateX(config.spawnSpread * (Math.random() - 0.5))
     shape.translateZ(config.spawnSpread * (Math.random() - 0.5))
     shape.translateY(config.spawnHeight + config.spawnSpread * (Math.random() - 0.5))
+
     shape.drift = config.driftMax * (Math.random() - 0.5)
-    shape.index = n
+    shape.fallSpeed = config.fallBase * Math.random() + config.fallScale * n
+    shape.rotSpeedX = config.rotBaseX * Math.random() + config.rotScale * n
+    shape.rotSpeedY = config.rotBaseY * Math.random() + config.rotScale * n
+    shape.rotSpeedZ = config.rotBaseZ * Math.random() + config.rotScale * n
 
     scene.add(shape)
     allShapes.push(shape)
@@ -57,13 +61,20 @@ function bricks() {
 const render = () => {
   requestAnimationFrame(render)
   renderer.render(scene, camera)
-  for (const shape of allShapes) {
-    const n = shape.index
-    shape.rotation.x += config.rotBaseX * Math.random() + config.rotScale * n
-    shape.rotation.y += config.rotBaseY * Math.random() + config.rotScale * n
-    shape.rotation.z += config.rotBaseZ * Math.random() + config.rotScale * n
-    shape.position.y -= config.fallBase * Math.random() + config.fallScale * n
+  for (let i = allShapes.length - 1; i >= 0; i--) {
+    const shape = allShapes[i]
+    shape.rotation.x += shape.rotSpeedX
+    shape.rotation.y += shape.rotSpeedY
+    shape.rotation.z += shape.rotSpeedZ
+    shape.position.y -= shape.fallSpeed
     shape.position.x += shape.drift
+
+    if (shape.position.y < -15) {
+      scene.remove(shape)
+      shape.geometry.dispose()
+      shape.material.dispose()
+      allShapes.splice(i, 1)
+    }
   }
 }
 
